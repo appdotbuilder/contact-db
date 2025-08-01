@@ -1,10 +1,20 @@
 
+import { db } from '../db';
+import { contactsTable } from '../db/schema';
 import { type GetContactInput, type Contact } from '../schema';
+import { eq } from 'drizzle-orm';
 
-export async function getContact(input: GetContactInput): Promise<Contact | null> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching a single contact by ID from the database.
-    // It should return the contact if found, or null if not found.
-    
-    return Promise.resolve(null);
-}
+export const getContact = async (input: GetContactInput): Promise<Contact | null> => {
+  try {
+    const result = await db.select()
+      .from(contactsTable)
+      .where(eq(contactsTable.id, input.id))
+      .execute();
+
+    // Return the first result or null if not found
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error('Contact retrieval failed:', error);
+    throw error;
+  }
+};
